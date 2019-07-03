@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using WiredBrainCoffee.DataAccess;
 
 namespace WiredBrainCoffee.ShopInfoTool
@@ -25,39 +24,12 @@ namespace WiredBrainCoffee.ShopInfoTool
 
                 var coffeeShops = coffeeShopDataProvider.LoadCoffeeShops();
 
-                if (string.Equals("help", line, StringComparison.OrdinalIgnoreCase))
-                {
-                    Console.WriteLine("> Available coffee shop commands are:");
-                    foreach (var coffeeShop in coffeeShops)
-                    {
-                        Console.WriteLine($"> " + coffeeShop.Location);
-                    }
-                }
-                else
-                {
-                    var foundCoffeeShops = coffeeShops
-                        .Where(x => x.Location.StartsWith(line, StringComparison.OrdinalIgnoreCase))
-                        .ToList();
-
-                    if(foundCoffeeShops.Count == 0)
-                    {
-                        Console.WriteLine($"> Command '{line}' not found");
-                    }
-                    else if(foundCoffeeShops.Count == 1)
-                    {
-                        var coffeeShop = foundCoffeeShops.Single();
-                        Console.WriteLine($"> Location: {coffeeShop.Location}");
-                        Console.WriteLine($"> Beans in stock: {coffeeShop.BeansInStockInKg}");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"> Multiple matching coffee shop commands found:");
-                        foreach (var coffeeType in foundCoffeeShops)
-                        {
-                            Console.WriteLine($"> {coffeeType.Location}");
-                        }
-                    }
-                }
+                var commandHandler =
+                    string.Equals("help", line, StringComparison.OrdinalIgnoreCase)
+                    ? new HelpCommandHandler(coffeeShops) as ICommandHandler
+                    : new CoffeeShopCommandHandler(coffeeShops, line);
+                    
+                commandHandler.HandleCommand();
             }
         }
     }
