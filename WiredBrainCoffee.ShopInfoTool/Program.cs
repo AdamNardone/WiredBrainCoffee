@@ -24,14 +24,12 @@ namespace WiredBrainCoffee.ShopInfoTool
 
                 var coffeeShops = coffeeShopDataProvider.LoadCoffeeShops();
 
-                if (string.Equals("help", line, StringComparison.OrdinalIgnoreCase))
-                {
-                    Console.WriteLine("> Available coffee shop commands are:");
-                    foreach (var coffeeShop in coffeeShops)
-                    {
-                        Console.WriteLine($"> " + coffeeShop.Location);
-                    }
-                }
+                var commandHandler =
+                    string.Equals("help", line, StringComparison.OrdinalIgnoreCase)
+                    ? new HelpCommandHandler(coffeeShops) as ICommandHandler
+                    : new CoffeeShopCommandHandler(coffeeShops, line);
+                    
+                commandHandler.HandleCommand();
             }
         }
     }
